@@ -1,103 +1,145 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState, useMemo } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { format } from 'date-fns';
+import { BarcodeScannerComponent } from '@/components/ui/BarcodeScannerComponent';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+
+interface ProductInfo {
+  barcode: string;
+  name: string;
+  price: number;
+}
+
+interface ScannedProduct extends ProductInfo {
+  scanTime: string; // Formatted date and time
+  scanDurationMs: number; // Time it took to scan
+}
+
+// Mock product database
+const mockProducts: ProductInfo[] = [
+  { barcode: "123456789012", name: "Milk (1 Liter)", price: 1.99 },
+  { barcode: "987654321098", name: "Bread (Whole Wheat)", price: 2.50 },
+  { barcode: "555111222333", name: "Eggs (Dozen)", price: 3.20 },
+  { barcode: "112233445566", name: "Apple Juice (1L)", price: 2.80 },
+  { barcode: "667788990011", name: "Cereal (Corn Flakes)", price: 4.50 },
+];
+
+const getProductInfo = (barcode: string): ProductInfo | null => {
+  return mockProducts.find(p => p.barcode === barcode) || null;
+};
+
+export default function HomePage() {
+  const [scannedItems, setScannedItems] = useState<ScannedProduct[]>([]);
+   const [manualBarcode, setManualBarcode] = useState<string>('');
+
+  const handleBarcodeScan = (barcode: string, scanDurationMs: number) => {
+    const product = getProductInfo(barcode);
+    if (product) {
+      const newScannedItem: ScannedProduct = {
+        ...product,
+        scanTime: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        scanDurationMs: parseFloat(scanDurationMs.toFixed(2)), // Round to 2 decimal places
+      };
+      setScannedItems(prevItems => [...prevItems, newScannedItem]);
+    } else {
+      alert(`Product not found for barcode: ${barcode}`);
+      // Optionally add a generic item for unknown barcodes
+      setScannedItems(prevItems => [...prevItems, {
+        barcode,
+        name: "Unknown Product",
+        price: 0.00,
+        scanTime: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        scanDurationMs: parseFloat(scanDurationMs.toFixed(2)),
+      }]);
+    }
+  };
+
+    // New handler for manual input
+  const handleManualScan = () => {
+    if (manualBarcode.trim()) {
+      // Use a dummy scan duration, or a small random number
+      handleBarcodeScan(manualBarcode.trim(), Math.random() * 50 + 100); // 100-150ms
+      setManualBarcode(''); // Clear the input field
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="container mx-auto p-4 max-w-4xl">
+      <h1 className="text-4xl font-extrabold text-center mb-8">Barcode Scanner App</h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Scan Barcode</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <BarcodeScannerComponent onScan={handleBarcodeScan} />
+          {/* Manual Input Section */}
+          <div className="mt-8 pt-4 border-t border-gray-200">
+            <h3 className="text-xl font-semibold mb-3">Manual Barcode Entry</h3>
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Enter barcode manually"
+                value={manualBarcode}
+                onChange={(e) => setManualBarcode(e.target.value)}
+                onKeyPress={(e) => { // Allow pressing Enter to scan
+                  if (e.key === 'Enter') {
+                    handleManualScan();
+                  }
+                }}
+              />
+              <Button onClick={handleManualScan}>Add Manually</Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Scanned Products</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {scannedItems.length === 0 ? (
+            <p className="text-center text-gray-500">No products scanned yet.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Barcode</TableHead>
+                    <TableHead>Product Name</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Scan Time (UTC)</TableHead>
+                    <TableHead>Scan Duration (ms)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {scannedItems.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{item.barcode}</TableCell>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>${item.price.toFixed(2)}</TableCell>
+                      <TableCell>{item.scanTime}</TableCell>
+                      <TableCell>{item.scanDurationMs} ms</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
