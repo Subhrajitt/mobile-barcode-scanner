@@ -10,14 +10,15 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
+    "@yudiel/react-qr-scanner": "^2.3.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.523.0",
     "next": "15.3.4",
     "react": "^19.0.0",
-    "react-barcode-detection": "^0.0.15",
     "react-dom": "^19.0.0",
+    "react-zxing": "^2.1.0",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
