@@ -74,8 +74,52 @@ export function BarcodeScannerComponent({ onScan }: BarcodeScannerProps) {
         {/* Overlay and Stop button, only visible when scanning is active */}
         {scanning && (
           <>
+            {/* <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="w-3/4 h-2/4 border-2 border-green-500 rounded-lg animate-pulse"></div>
+            </div> */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-3/4 h-1/4 border-2 border-green-500 rounded-lg animate-pulse"></div>
+              <div className="relative w-3/4 h-2/4 rounded-lg overflow-hidden">
+                {/* 4 Corner Borders */}
+                <div className="absolute top-0 left-0 w-8 h-1 bg-green-500 rounded-sm" />
+                <div className="absolute top-0 left-0 w-1 h-8 bg-green-500 rounded-sm" />
+
+                <div className="absolute top-0 right-0 w-8 h-1 bg-green-500 rounded-sm" />
+                <div className="absolute top-0 right-0 w-1 h-8 bg-green-500 rounded-sm" />
+
+                <div className="absolute bottom-0 left-0 w-8 h-1 bg-green-500 rounded-sm" />
+                <div className="absolute bottom-0 left-0 w-1 h-8 bg-green-500 rounded-sm" />
+
+                <div className="absolute bottom-0 right-0 w-8 h-1 bg-green-500 rounded-sm" />
+                <div className="absolute bottom-0 right-0 w-1 h-8 bg-green-500 rounded-sm" />
+
+                {/* Scan Line */}
+                <div
+                  className="absolute left-0 w-full h-0.5 bg-red-400 animate-[scan_2s_ease-in-out_infinite]"
+                  style={{
+                    animationName: "scan",
+                    animationDuration: "2s",
+                    animationTimingFunction: "ease-in-out",
+                    animationIterationCount: "infinite",
+                    animationDirection: "alternate",
+                    position: "absolute",
+                    top: 0,
+                    animationFillMode: "forwards",
+                  }}
+                />
+              </div>
+
+              {/* Global keyframes */}
+              <style jsx global>{`
+                  @keyframes scan {
+                    0% {
+                        top: 0%;
+                      }
+                    100% {
+                          top: 90%;
+                        }
+                    }
+                  `}
+              </style>
             </div>
             <Button className="mt-4" onClick={handleScanStop}>Stop Scanning</Button>
           </>
